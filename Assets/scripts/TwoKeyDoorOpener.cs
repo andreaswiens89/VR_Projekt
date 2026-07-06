@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
@@ -17,6 +18,10 @@ public class TwoKeyDoorOpener : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip winSound;
 
+    [Header("Hinweis")]
+    public GameObject messageCanvas;
+    public float messageDuration = 3f;
+
     private Quaternion closedRotation;
     private Quaternion openRotation;
 
@@ -26,6 +31,12 @@ public class TwoKeyDoorOpener : MonoBehaviour
     {
         closedRotation = doorPivot.localRotation;
         openRotation = closedRotation * Quaternion.Euler(0f, openAngle, 0f);
+
+        // Canvas beim Spielstart ausblenden
+        if (messageCanvas != null)
+        {
+            messageCanvas.SetActive(false);
+        }
     }
 
     void Update()
@@ -35,25 +46,39 @@ public class TwoKeyDoorOpener : MonoBehaviour
 
         bool bothKeysInserted = socket1HasKey && socket2HasKey;
 
-        // Win-Sound nur einmal abspielen
+        // Tür nur einmal öffnen
         if (bothKeysInserted && !doorOpened)
         {
             doorOpened = true;
 
+            // Sound abspielen
             if (audioSource != null && winSound != null)
             {
                 audioSource.PlayOneShot(winSound);
             }
+
+            // Hinweis anzeigen
+            StartCoroutine(ShowMessage());
         }
 
-        Quaternion targetRotation = bothKeysInserted
-            ? openRotation
-            : closedRotation;
+        Quaternion targetRotation = doorOpened ? openRotation : closedRotation;
 
         doorPivot.localRotation = Quaternion.Lerp(
             doorPivot.localRotation,
             targetRotation,
             Time.deltaTime * openSpeed
         );
+    }
+
+    IEnumerator ShowMessage()
+    {
+        if (messageCanvas != null)
+        {
+            messageCanvas.SetActive(true);
+
+            yield return new WaitForSeconds(messageDuration);
+
+            messageCanvas.SetActive(false);
+        }
     }
 }

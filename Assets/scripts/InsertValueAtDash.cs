@@ -13,7 +13,7 @@ public class InsertValueAtDash : MonoBehaviour
     public string defaultText = "- - - -";
 
     [Header("Richtiger Code")]
-    public string correctCode = "1670";
+    public string correctCode = "1654";
 
     [Header("Audio")]
     public AudioSource audioSource;
@@ -23,6 +23,9 @@ public class InsertValueAtDash : MonoBehaviour
     [Header("Schublade")]
     //public DrawerMover drawerMover;
     public static bool correct = false;
+
+    [Header("Belohnung")]
+    public GameObject keyObject;
 
 
     public void InsertValue()
@@ -67,8 +70,13 @@ public class InsertValueAtDash : MonoBehaviour
                 audioSource.PlayOneShot(successSound);
             correct = true;
 
-           // if (drawerMover != null)
-             //   drawerMover.OpenDrawer();
+            if (keyObject != null)
+            {
+                keyObject.SetActive(true);
+            }
+
+            // if (drawerMover != null)
+            //   drawerMover.OpenDrawer();
         }
         else
         {
